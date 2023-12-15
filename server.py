@@ -12,6 +12,8 @@ with open("index.html") as f:
     index_page = f.read()
 with open("overlay.html") as f:
     overlay_page = f.read()
+with open("favicon.ico", "rb") as f:
+    favicon = f.read()
 
 
 def get_time_passed(seconds):
@@ -124,14 +126,20 @@ async def get_data():
     return data_cache
 
 
+async def site_icon():
+    return favicon
+
+
 async def app(scope, receive, send):
     pathing = {
         "": get_page,
         "/overlay": get_overlay,
-        "/data": get_data
+        "/data": get_data,
+        "/favicon.ico": site_icon
     }
     memtypes = {
-        "/data": "application/json"
+        "/data": "application/json",
+        "/favicon.ico": "image/x-icon"
     }
     assert scope["type"] == "http"
 

@@ -1,3 +1,5 @@
+This branch contains some things unique to [kariyu.sheppsu.me](https://kariyu.sheppsu.me).
+
 # osu-score-tracker
 Programs for tracking scores and displaying them in website form,
 essentially serving as a fresh profile of sorts. Was originally made as an idea to

@@ -1,6 +1,5 @@
 .idea/
 __pycache__/
 
-favicon.ico
 *.db
 .env
