@@ -2,7 +2,9 @@
 Programs for tracking scores and displaying them in website form,
 essentially serving as a fresh profile of sorts. Was originally made as an idea to
 track Kariyu's left hand top plays on
-[kariyu.sheppsu.me](https://kariyu.sheppsu.me). 
+[kariyu.sheppsu.me](https://kariyu.sheppsu.me).
+
+The db structure isn't rly efficient cuz of possible duplicate beatmap stats, but I didn't care enough to separate stuff out when I initially made it. Only thing I cared to make efficient was website serving.
 
 # Website
 - Index page with top 100 scores, rank, total pp, and graph
