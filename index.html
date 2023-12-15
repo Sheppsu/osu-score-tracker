@@ -156,9 +156,19 @@
 				-ms-user-select: none; /* IE 10 and IE 11 */
 				user-select: none; /* Standard syntax */
 			}
+			
+			#source-code {
+				width: auto;
+				font-size: 15px;
+			}
+			
+			#source-code:hover {
+				text-decoration: underline;
+			}
 		</style>
 	</head>
 	<body>
+		<a id="source-code" href="https://github.com/Sheppsu/osu-score-tracker" target="_blank">[Source code]</a>
 		<div class="page-content">
 			{% content %}
 		</div>
