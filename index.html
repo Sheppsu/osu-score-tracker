@@ -1,0 +1,224 @@
+<!doctype html>
+<html>
+	<head>
+		<title>osu! profile</title>
+		<style>
+			body {
+				background-color: #1c1719;
+				
+				color: white;
+				font-family: Torus,Inter,"Helvetica Neue",Tahoma,Arial,"Hiragino Kaku Gothic ProN",Meiryo,"Microsoft YaHei","Apple SD Gothic Neo",sans-serif;
+				font-size: 10px;
+			}
+			
+			h1 {
+				margin: 0;
+				margin-bottom: 10px;
+			}
+			
+			p {
+				margin: 0;
+			}
+			
+			a {
+				width: 95%;
+				
+				color: unset;
+				text-decoration: none;
+			}
+			
+			p.ultra {
+				font-size: 15px;
+				font-weight: 600;
+			}
+			
+			p.big {
+				font-size: 15px;
+				font-weight: 400;
+			}
+			
+			p.small {
+				font-size: 10px;
+				font-weight: 200;
+				color: #cccccc;
+			}
+
+			path {
+				stroke: white;
+				stroke-width: 2;
+				fill: none;
+			}
+
+			#graph-container {
+				width: 500px;
+				height: 100px;
+				margin-bottom: 10px;
+
+				position: relative;
+
+				background-color: rgba(0, 0, 0, 0.2);
+			}
+
+			#graph-marker {
+				width: 1px;
+				height: 100px;
+
+				position: absolute;
+
+				background-color: white;
+			}
+
+			#graph-marker.hidden {
+				display: none;
+			}
+
+			#graph-label {
+				width: 120px;
+				height: 50px;
+				transform: translate(5px, 25px);
+
+				position: absolute;
+
+				display: flex;
+				flex-direction: column;\
+				gap: 5px;
+				justify-content: center;
+				align-items: center;
+
+				border-radius: 10px;
+				background-color: rgba(0, 0, 0, 0.5);
+				font-size: 15px;
+			}
+
+			#graph-label.hidden {
+				display: none;
+			}
+
+			#graph-label.right {
+				transform: translate(375px, 25px)
+			}
+			
+			.page-content {
+				width: calc(100% - 20px);
+				max-width: 980px;
+				margin: auto;
+				padding: 20px 10px;
+				
+				border-radius: 10px;
+				
+				background-color: #382e32;
+			}
+			
+			.score-container {
+				width: 100%;
+				
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 5px;
+			}
+			
+			.score {
+				width: 100%;
+				height: 50px;
+				padding: 0 5px;
+			
+				border-radius: 5px;
+				
+				display: flex;
+				justify-content: space-between;
+			
+				background-color: #705c65;
+			}
+			
+			.score-section {
+				padding: 0 5px;
+			
+				display: flex;
+				flex-direction: column;
+				gap: 5px;
+				justify-content: center;
+			}
+			
+			.score-section.grow {
+				flex-grow: 1;
+				
+				overflow: hidden;
+				text-wrap: nowrap;
+			}
+			
+			.score-section.center {
+				align-items: center;
+			}
+
+			.prevent-select {
+				-webkit-user-select: none; /* Safari */
+				-ms-user-select: none; /* IE 10 and IE 11 */
+				user-select: none; /* Standard syntax */
+			}
+		</style>
+	</head>
+	<body>
+		<div class="page-content">
+			{% content %}
+		</div>
+	</body>
+
+	<script>
+		const rankHistory = {% rank_history %};
+		const ppHistory = {% pp_history %};
+		const graph = document.getElementById("graph-container");
+		const svg = graph.querySelector("svg");
+		const path = svg.querySelector("path");
+		const graphMarker = document.getElementById("graph-marker");
+		const graphLabel = document.getElementById("graph-label");
+		const rankLabel = document.getElementById("rank-label");
+		const timeLabel = document.getElementById("time-label");
+
+		const minRank = Math.min(...rankHistory);
+		const maxRank = Math.max(...rankHistory);
+		const width = 500;
+		const height = 98;
+		const increments = width/(rankHistory.length-1);
+
+		let d = `M0,${(1-(maxRank-rankHistory[0])/(maxRank-minRank))*height+1}`
+		let i = -1;
+		for (const rank of rankHistory) {
+			i += 1;
+			if (i == 0) continue;
+			d += `L${i/(rankHistory.length-1)*width},${(1-(maxRank-rank)/(maxRank-minRank))*height+1}`
+		}
+		path.setAttribute("d", d);
+
+		var hovering = false;
+		var labelOnRight = false;
+		addEventListener("mousemove", (evt) => {
+			const rect = graph.getBoundingClientRect();
+			if (rect.left <= evt.x && rect.right >= evt.x && rect.top <= evt.y && rect.bottom >= evt.y) {
+				if (!hovering) {
+					graphMarker.classList.remove("hidden");
+					graphLabel.classList.remove("hidden");
+					hovering = true;
+				}
+
+				const offset = evt.x - rect.left;
+				const rankI = Math.round(offset/increments)
+
+				graphMarker.style.transform = `translate(${rankI*increments}px, 0)`;
+				rankLabel.innerHTML = `#${rankHistory[rankI]}`;
+				timeLabel.innerHTML = rankI == rankHistory.length-1 ? "now" : `${(rankHistory.length-1)-rankI} days ago`;
+				if (offset <= 125 && !labelOnRight) {
+					graphLabel.classList.add("right")
+					labelOnRight = true;
+				} else if (offset >= 375 && labelOnRight) {
+					graphLabel.classList.remove("right");
+					labelOnRight = false;
+				}
+			} else if (hovering) {
+				graphMarker.classList.add("hidden");
+				graphLabel.classList.add("hidden");
+				hovering = false;
+			}
+		});
+	</script>
+</html>

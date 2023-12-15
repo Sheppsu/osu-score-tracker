@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+    <head>
+        <style>
+            body {
+				color: black;
+				font-family: Torus,Inter,"Helvetica Neue",Tahoma,Arial,"Hiragino Kaku Gothic ProN",Meiryo,"Microsoft YaHei","Apple SD Gothic Neo",sans-serif;
+				font-size: 10px;
+			}
+
+			h1 {
+				margin: 0;
+			}
+			
+			p {
+				margin: 0;
+			}
+			
+			.container {
+				display: flex;
+				flex-direction: column;
+			}
+
+			#rank-label {
+			    font-size: 50px;
+			}
+			
+			#rank-change {
+				font-size: 20px;
+				font-weight: 1000;
+				opacity: 0;
+				transition: opacity 0.5s;
+			}
+			
+			#rank-change.increase {
+				color: #13e000;
+				opacity: 1;
+			}
+			
+			#rank-change.decrease {
+				color: #e02900;
+				opacity: 1;
+			}
+        </style>
+    </head>
+    <body>
+		<div class="container">
+			<h1 id="rank-label">Loading...</h1>
+			<p id="rank-change"></p>
+		</div>
+        
+    </body>
+    <script>
+        const rankLabel = document.getElementById("rank-label");
+		const diffLabel = document.getElementById("rank-change");
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const color = urlParams.get("color");
+        if (color !== null) {
+            rankLabel.style.color = color;
+        }
+		
+		var lastRank = 0;
+		
+		function flashDifference(rankDifference) {
+			if (rankDifference > 0) {
+				diffLabel.innerHTML = `+${rankDifference}`;
+				diffLabel.classList.add("increase");
+			} else {
+				diffLabel.innerHTML = rankDifference;
+				diffLabel.classList.add("decrease");
+			}
+			setTimeout(() => {
+				diffLabel.innerHTML = "";
+				diffLabel.setAttribute("class", "rank-change");
+			}, 5000);
+		}
+
+        function update() {
+            fetch("/data").then((resp) => {
+                if (!resp.ok) {
+                    console.log(resp);
+                }
+                return resp.json();
+            }).then((data) => {
+                rankLabel.innerHTML = `#${data.rank}`;
+				if (lastRank != 0 && lastRank != data.rank) {
+					flashDifference(lastRank - data.rank);
+				}
+				lastRank = data.rank;
+                setTimeout(update, 2000);
+            }).catch((e) => {
+				console.log("Failed to fetch rank... trying again in 5 seconds");
+				setTimeout(update, 5000);
+			});
+        }
+
+        update();
+    </script>
+</html>
