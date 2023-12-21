@@ -32,7 +32,7 @@ def get_time_passed(seconds):
         if value == 0:
             break
         next_label = times[i+1][0] + ("s" if value != 1 else "")
-        text = f"{value} {next_label} {bounded_value} {label + ('s' if bounded_value != 1 else '')}"
+        text = f"{round(value)} {next_label} {round(bounded_value)} {label + ('s' if bounded_value != 1 else '')}"
         
     return text
 
