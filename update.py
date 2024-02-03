@@ -1,4 +1,4 @@
-from osu import Client, SoloScore, RankStatus
+from osu import Client, SoloScore, RankStatus, Mods
 from time import sleep
 from datetime import datetime, timezone
 from osu_diff_calc import OsuPerformanceCalculator, OsuDifficultyAttributes, OsuScoreAttributes
@@ -74,13 +74,21 @@ def update_stats(cursor):
 
 
 def calculate_pp(score: SoloScore, beatmap):
+    for mod in score.mods:
+        # lazer score with (currently) non-pp mods
+        if mod.settings is not None:
+            return
+
+    score.mods = list(filter(lambda m: type(m.mod) != str and m.mod.name in Mods._member_names_, score.mods))
+    mods = list(map(lambda m: Mods[m.mod.name], score.mods))
+
     tries = 0
     while True:
         try:
             tries += 1
             beatmap_attributes = client.get_beatmap_attributes(
                 score.beatmap_id,
-                mods=list(map(lambda m: m.mod.value, score.mods)),
+                mods=mods,
                 ruleset_id=score.ruleset_id
             )
             break
