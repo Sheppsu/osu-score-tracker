@@ -141,7 +141,10 @@ def add_scores():
 
 def run():
     while True:
-        add_scores()
+        try:
+            add_scores()
+        except Exception as e:
+            print(e)
         sleep(5)
 
 
